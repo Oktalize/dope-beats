@@ -13,6 +13,8 @@ type Bag = {
   neck: string
   ring: string
   items: Item[]
+  vehicle: string
+  drug: string
 }
 
 type ItemSlots = {

@@ -4,6 +4,7 @@ import ScrollToTop from "../components/ScrollToTop";
 import HomePage from "../pages/HomePage";
 import HelpPage from "../pages/HelpPage";
 import WalletPage from "../pages/WalletPage";
+import DopeBeatsPage from "../pages/DopeSoundsPage";
 
 function App() {
   return (
@@ -18,6 +19,9 @@ function App() {
           </Route>
           <Route path={`/adventurer/:address`}>
             <WalletPage />
+          </Route>
+          <Route path={`/beats`}>
+            <DopeBeatsPage />
           </Route>
         </Switch>
       </AppLayout>
