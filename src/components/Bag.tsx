@@ -1,9 +1,10 @@
-import { useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import useMeasure from "use-measure";
 import { rarityImageFromItems } from "gear-rarity";
 import rarities from "../data/rare.json";
 import { colors } from "../helpers/theme";
 import Item from "./Item";
+import { soundFromBagItems } from "../helpers/beats";
 
 const ENDPOINT =
   "https://opensea.io/assets/0xff9c1b15b16263c61d017ee9f65c50e4ae0113d7/";
@@ -42,10 +43,27 @@ function Bag({ bag }: BagProps) {
   const scores = rarities.find((loot) => loot.lootId === Number(bag.id));
   const itemScore = bag.items.reduce((score, item) => item.rarity + score, 0);
 
-  console.log(bag.items)
+  const audioSources = useMemo(() => {
+    return soundFromBagItems(bag.items);
+  }, [bag]);
+
+  const [playing, setPlaying] = useState(false);
+
+  let audioRefs = useRef<{ [id: string]: HTMLAudioElement; }>({});
+
+  const onPlay = useCallback(() => {
+    if (!playing) {
+      setPlaying(true);
+      Object.values(audioRefs.current).forEach((ar) => ar.play());
+    } else {
+      setPlaying(false);
+      Object.values(audioRefs.current).forEach((ar) => ar.pause());
+    }
+  }, [playing, audioRefs, setPlaying]);
+
   return (
     <div style={style.container} className="bag-container">
-      <div style={{ ...style.bag, height: width }} ref={ref} className="bag">
+      <div style={{ ...style.bag, height: "550px" }} ref={ref} className="bag">
         <img
           src={rarityImageFromItems(
             bag.items
@@ -59,7 +77,20 @@ function Bag({ bag }: BagProps) {
           )}
           alt=""
         />
+        <button onClick={onPlay}>{playing ? "Pause" : "Play"} radio</button>
       </div>
+      {audioSources.map((src) =>
+        <audio
+          key={src}
+          src={src}
+          ref={r => {
+            if (!r) return;
+
+            audioRefs.current[src] = r;
+          }}
+          loop
+        />
+      )}
       <div style={style.footer} className="bag-footer">
         <a
           style={style.link}
